@@ -409,6 +409,13 @@ def create_parser():
         '--live-from-start',
         action='store_true', dest='live_from_start',
         help='Download livestreams from the start. Currently only supported for YouTube (Experimental)')
+# ******************************************
+    general.add_option(
+    '--live-from-start-seq',
+    action='store', dest='live_from_start_seq', metavar="[SeqA-SeqB] || [seqN]", default=None,
+    help=('Option for --live-from-start either range sequence (SeqA-SeqB) or only from N sequence to current live (googlevideos sq params). '
+        'Example: "1-100" OR "100". Ability to know which sequence you want is required and it can be done using browser developer tools. Currently only supported for YouTube'))
+# ******************************************
     general.add_option(
         '--no-live-from-start',
         action='store_false', dest='live_from_start',

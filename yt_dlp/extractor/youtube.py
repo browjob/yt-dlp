@@ -2756,6 +2756,16 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
         mpd_url, stream_number, is_live = None, None, True
 
         begin_index = 0
+#*****************************************************
+        force_last_seq = False
+
+        # parse --live-from-start-seq sequence if set
+        sequence = self.get_param("live_from_start_seq").split('-')
+        if sequence:
+            begin_index = int(sequence[0])
+            if len(sequence) > 1:
+                force_last_seq = int(sequence[1]) + 1 or False
+#*****************************************************
         download_start_time = ctx.get('start') or time.time()
 
         lack_early_segments = download_start_time - (live_start_time or download_start_time) > MAX_DURATION
@@ -2812,14 +2822,24 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                         last_segment_url, None, note=False, errnote=False, fatal=False)
                 except ExtractorError:
                     urlh = None
-                last_seq = try_get(urlh, lambda x: int_or_none(x.headers['X-Head-Seqnum']))
+                    # ************************************************
+                if force_last_seq:
+                    last_seq=force_last_seq
+                else:
+                    last_seq = try_get(urlh, lambda x: int_or_none(x.headers['X-Head-Seqnum']))
+                    # ************************************************
                 if last_seq is None:
                     no_fragment_score += 2
                     last_segment_url = None
                     continue
             else:
-                should_continue, last_seq = _extract_sequence_from_mpd(True, no_fragment_score > 15)
-                no_fragment_score += 2
+                    # **************************
+                if force_last_seq:
+                    should_continue, last_seq = True, force_last_seq
+                else:
+                    should_continue, last_seq = _extract_sequence_from_mpd(True, no_fragment_score > 15)
+                    no_fragment_score += 2
+                    # **************************
                 if not should_continue:
                     continue
 
@@ -2827,7 +2847,8 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                 last_segment_url = None
                 continue
 
-            last_seq += 1
+            if not force_last_seq:
+                last_seq += 1
 
             if begin_index < 0 and known_idx < 0:
                 # skip from the start when it's negative value
