@@ -413,6 +413,14 @@ If you fork the project on GitHub, you can run your fork's [build workflow](.git
     --live-from-start               Download livestreams from the start.
                                     Currently only supported for YouTube
                                     (Experimental)
+    --live-from-start-seq [SeqA-SeqB] || [seqN]
+                                    Option for --live-from-start either range
+                                    sequence (SeqA-SeqB) or only from N sequence
+                                    to current live (googlevideos sq params).
+                                    Example: "1-100" OR "100". Ability to know
+                                    which sequence you want is required and it
+                                    can be done using browser developer tools.
+                                    Currently only supported for YouTube
     --no-live-from-start            Download livestreams from the current time
                                     (default)
     --wait-for-video MIN[-MAX]      Wait for scheduled streams to become
